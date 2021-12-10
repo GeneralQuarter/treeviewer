@@ -1,45 +1,30 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Circle, Tooltip, useMapEvent } from 'react-leaflet';
-import { Circle as LeafletCircle, LatLng, Renderer } from 'leaflet';
+import { Circle as LeafletCircle, Renderer } from 'leaflet';
 import HeightTriangle from './height-triangle';
 import { Plant } from '../../models/plant';
 
 export interface PlantMarkerProps {
   plant: Plant;
-  onPositionChange?: (newPosition: LatLng) => void;
   onClick?: (event: MouseEvent) => void;
   selected?: boolean;
   renderer: Renderer
 }
 
-export default function PlantMarker({ plant, onPositionChange, onClick, selected, renderer }: PlantMarkerProps) {
+export default function PlantMarker({ plant, onClick, selected, renderer }: PlantMarkerProps) {
   const circleRef = useRef<LeafletCircle | null>(null);
   const [showLabel, setShowlabel] = useState(false);
-  const [locked, setLocked] = useState(true);
-  const [newPosition, setNewPosition] = useState<LatLng | null>(null);
-
-  const eventHandlers = {
-    contextmenu() {
-      if (!locked && newPosition) {
-        onPositionChange?.(newPosition);
-        setNewPosition(null);
-      }
-
-      setLocked(!locked);
-    },
+  const eventHandlers = useMemo(() => ({
     click(e: {target: LeafletCircle, originalEvent: MouseEvent}) {
-      if (e.target.pm.dragging()) {
-        return;
-      }
-
       onClick?.(e.originalEvent);
-    },
-    'pm:dragend': (e: {target: LeafletCircle}) => {
-      setNewPosition(e.target.getLatLng());
     }
-  };
+  }), [onClick]);
 
-  const updateShowLabel = () => {
+  const isAzoteFixator = useMemo(() => {
+    return plant.tags.includes('fixateurDazote');
+  }, [plant.tags]);
+
+  const updateShowLabel = useCallback(() => {
     const circle = circleRef.current;
 
     if (!circle) {
@@ -57,40 +42,20 @@ export default function PlantMarker({ plant, onPositionChange, onClick, selected
         setShowlabel(false)
       }
     }
-  }
+  }, [circleRef, showLabel]);
 
-  useMapEvent('zoomend', updateShowLabel);
   useMapEvent('moveend', updateShowLabel);
-
-  useEffect(() => {
-    const circle = circleRef.current;
-
-    if (!circle) {
-      return;
-    }
-
-    const isAzoteFixator = plant.tags.includes('fixateurDazote');
-
-    if (locked) {
-      setTimeout(() => {
-        circle.pm.disableLayerDrag();
-      }, 0)
-      circle.setStyle({fillColor: isAzoteFixator ? 'green' : 'gray'});
-    } else {
-      circle.pm.enableLayerDrag();
-      circle.setStyle({fillColor: 'blue'});
-    }
-  }, [circleRef, locked, plant.tags])
   
   return (
     <Circle center={plant.position} 
       radius={plant.width / 2}
       ref={circleRef}
       eventHandlers={eventHandlers}
-      pathOptions={{color: selected ? 'blue' : 'gray'}} 
+      pathOptions={{ color: selected ? 'blue' : 'gray', fillColor: isAzoteFixator ? 'green' : 'gray' }} 
       weight={1} 
-      renderer={renderer}>
-      {showLabel && 
+      renderer={renderer} 
+    >
+      {selected && showLabel && 
         <Tooltip direction="center" interactive={false} permanent={true} className="plant-label">
           <div className="code">{plant.code}</div>
           <div className="height">{plant.height}</div>

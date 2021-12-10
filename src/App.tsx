@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import EditorMap from './components/map/editor-map';
 import styled from '@emotion/styled';
 import { useMeasurementGraph } from './lib/use-measurement-graph';
@@ -37,8 +37,6 @@ const FixedFab = styled(Fab)`
   z-index: 1000;
 `;
 
-const fullRenderer = new SVG({ padding: 1 });
-
 function App() {
   const [plants] = usePlants();
   const [selectedPlant, setSelectedPlant] = useState<Plant | undefined>(undefined);
@@ -46,14 +44,17 @@ function App() {
   const [tapeActive, setTapeActive] = useState(false);
   const [measurementNodeStart, setMeasurementNodeStart] = useState<MeasurementNode | undefined>(undefined);
   const [geolocationActive, setGeolocationActive, currentCoords] = useGeolocation();
+  const fullRenderer = useMemo(() => {
+    return new SVG({ padding: 1 });
+  }, []);
 
   const distanceToPlant = useMemo(() => {
-    if (!selectedPlant || currentCoords === null) {
+    if (!selectedPlant || !geolocationActive || currentCoords === null) {
       return undefined;
     }
 
     return distanceTo(selectedPlant.position, [currentCoords.latitude, currentCoords.longitude]);
-  }, [selectedPlant, currentCoords])
+  }, [selectedPlant, geolocationActive, currentCoords]);
 
   const addMeasurementNode = (measurementNode: MeasurementNode) => {
     if (measurementNodeStart === undefined) {
@@ -100,10 +101,20 @@ function App() {
     <Container>
       <EditorMap>
         {POLYGONS.map(polygon => (
-          <Polygon key={polygon.label} positions={polygon.positions} pathOptions={polygon.pathOptions} renderer={fullRenderer} pmIgnore={true} />
+          <Polygon 
+            key={polygon.label} 
+            positions={polygon.positions} 
+            pathOptions={polygon.pathOptions} 
+            renderer={fullRenderer}
+          />
         ))}
         {POLYLINES.map(polyline => (
-          <Polyline key={polyline.label} positions={polyline.positions} pathOptions={polyline.pathOptions} renderer={fullRenderer} pmIgnore={true} />
+          <Polyline 
+            key={polyline.label} 
+            positions={polyline.positions} 
+            pathOptions={polyline.pathOptions} 
+            renderer={fullRenderer}
+          />
         ))}
         {geolocationActive && currentCoords && <LocationIndicator coords={currentCoords} renderer={fullRenderer} />}
         {plants.map(plant => (
@@ -114,18 +125,36 @@ function App() {
             onClick={e => plantClicked(plant, e)} />
         ))}
         {measurementLines.map(line => (
-          <MeasurementPolyline key={line.id} line={line} tooltipClick={() => {
-            removeMeasurement(line.id.split('->') as [string, string])
-          }} renderer={fullRenderer} />
+          <MeasurementPolyline 
+            key={line.id} 
+            line={line} 
+            tooltipClick={() => {
+              removeMeasurement(line.id.split('->') as [string, string])
+            }}
+            renderer={fullRenderer} 
+          />
         ))}
         {tapeActive && LANDMARKS.map(landmark => (
-          <LandmarkMarker key={landmark.label} landmark={landmark} renderer={fullRenderer} onClick={() => landmarkClicked(landmark)} />
+          <LandmarkMarker 
+            key={landmark.label} 
+            landmark={landmark} 
+            renderer={fullRenderer} 
+            onClick={() => landmarkClicked(landmark)}
+          />
         ))}
       </EditorMap>
-      <FixedFab sx={{ right: '16px', bottom: '72px' }} color={tapeActive ? 'primary' : 'default'} onClick={() => tapeClicked()}>
+      <FixedFab 
+        sx={{ right: '16px', bottom: '72px' }} 
+        color={tapeActive ? 'primary' : 'default'} 
+        onClick={() => tapeClicked()}
+      >
         <StraightenIcon />
       </FixedFab>
-      <FixedFab sx={{ right: '16px', top: '16px' }} color={geolocationActive ? 'primary' : 'default'} onClick={() => setGeolocationActive(!geolocationActive)}>
+      <FixedFab 
+        sx={{ right: '16px', top: '16px' }} 
+        color={geolocationActive ? 'primary' : 'default'} 
+        onClick={() => setGeolocationActive(!geolocationActive)}
+      >
         {geolocationActive ? currentCoords ? <GpsFixedIcon /> : <LocationSearchingIcon /> : <LocationDisabledIcon />}
       </FixedFab>
       {(currentCoords && geolocationActive) && <Box sx={{ position: 'absolute', top: '24px', right: '88px', zIndex: 1000, backgroundColor: 'white', p: 1, borderRadius: 10 }}>

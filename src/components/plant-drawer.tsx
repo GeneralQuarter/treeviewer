@@ -3,10 +3,10 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import Skeleton from '@mui/material/Skeleton';
 import { Plant } from '../models/plant';
 import Stack from '@mui/material/Stack';
 import { green, orange, red } from '@mui/material/colors';
+import PlantDetails from './plant-details';
 
 const drawerBleeding = 56;
 
@@ -60,11 +60,17 @@ const PlantDrawer: FC<PlantDrawerProps> = ({ plant, distanceTo }) => {
         borderTopRightRadius: 8,
         visibility: 'visible',
         right: 0,
-        left: {xs: 0, md: 'auto'},
-        width: {xs: '100%', md: '380px'},
+        left: 0,
+        width: '100%',
         pointerEvents: 'auto'
       }}
-      onClick={() => {setOpen(!open)}}
+      onClick={() => {
+        if (!open && !plant) {
+          return;
+        }
+        
+        setOpen(!open)
+      }}
     >
       <Stack direction="row" alignItems="center">
         <Typography 
@@ -94,7 +100,7 @@ const PlantDrawer: FC<PlantDrawerProps> = ({ plant, distanceTo }) => {
         overflow: 'auto',
       }}
     >
-      <Skeleton variant="rectangular" height="100%" />
+      {plant && <PlantDetails plant={plant} />}
     </WhiteBox>
   </SwipeableDrawer>
 }

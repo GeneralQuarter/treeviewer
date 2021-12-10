@@ -17,7 +17,7 @@ const MeasurementPolyline: FC<MeasurementPolylineProps> = ({ line, tooltipClick,
     return distanceTo(line.start, line.end).toFixed(2);
   }, [line.start, line.end]);
 
-  return <Polyline positions={[line.start, line.end]} pathOptions={measurementPathoptions} pmIgnore={true} renderer={renderer}>
+  return <Polyline positions={[line.start, line.end]} pathOptions={measurementPathoptions} renderer={renderer}>
     <Tooltip direction="center" interactive={true} permanent={true}>
       <div onClick={() => {tooltipClick?.()}}>{distance}&nbsp;m</div>
     </Tooltip>

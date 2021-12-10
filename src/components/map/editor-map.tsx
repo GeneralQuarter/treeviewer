@@ -1,16 +1,16 @@
 import { LatLngTuple, Map } from 'leaflet';
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useCallback, useMemo } from 'react';
 import { MapContainer } from 'react-leaflet';
-
-import '@geoman-io/leaflet-geoman-free';
 import { addSmoothWheelZoom } from '../../lib/leaflet/add-smooth-wheel-zoom';
 
-const initialCenter: LatLngTuple = [46.37926, 0.88279];
-
 const EditorMap: FC<PropsWithChildren<{}>> = ({ children }) => {
-  const whenCreated = (map: Map) => {
+  const initialCenter = useMemo(() => {
+    return [46.37926, 0.88279] as LatLngTuple;
+  }, []);
+
+  const whenCreated = useCallback((map: Map) => {
     addSmoothWheelZoom(map);
-  }
+  }, []);
 
   return <MapContainer
     center={initialCenter}
