@@ -1,4 +1,4 @@
-import { useEffect,  useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Plant } from '../models/plant';
 import { getPlantsWithPosition } from './api/get-plants-with-position';
 
@@ -15,28 +15,32 @@ export function usePlants(): UsePlants {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const refetch = async () => {
+  const fetchPlants = async () => {
+    const result = await getPlantsWithPosition();
+    setPlants(result.items);
+    localStorage.setItem(cacheKey, JSON.stringify(result.items));
+  }
+
+  const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const result = await getPlantsWithPosition();
-      setPlants(result.items);
-      localStorage.setItem(cacheKey, JSON.stringify(result.items));
+      await fetchPlants();
     } catch (e) {
       setError('Could not load plants');
     }
 
     setLoading(false);
-  }
+  }, []);
 
   useEffect(() => {
     const json = localStorage.getItem(cacheKey);
 
     if (!json) {
       (async () => {
-        await refetch();
-      })()
+        await refresh();
+      })();
       return;
     }
 
@@ -44,7 +48,16 @@ export function usePlants(): UsePlants {
       const cachedPlants = JSON.parse(json);
       setPlants(cachedPlants);
     } catch (e) {}
-  }, []);
+
+    // Only try to update plants if online and not in development
+    if (navigator.onLine && process.env.NODE_ENV !== 'development') {
+      (async () => {
+        try {
+          await fetchPlants();
+        } catch (e) {}
+      })()
+    }
+  }, [refresh]);
 
   return [plants, loading, error];
 }

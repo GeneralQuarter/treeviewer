@@ -44,6 +44,8 @@ function App() {
   const [tapeActive, setTapeActive] = useState(false);
   const [measurementNodeStart, setMeasurementNodeStart] = useState<MeasurementNode | undefined>(undefined);
   const [geolocationActive, setGeolocationActive, currentCoords] = useGeolocation();
+  const [activePlantLabels, setActivePlantLabels] = useState<string[]>([]);
+
   const fullRenderer = useMemo(() => {
     return new SVG({ padding: 1 });
   }, []);
@@ -55,6 +57,25 @@ function App() {
 
     return distanceTo(selectedPlant.position, [currentCoords.latitude, currentCoords.longitude]);
   }, [selectedPlant, geolocationActive, currentCoords]);
+
+  const showPlantLabel = (plantId: string, show: boolean) => {
+    const index = activePlantLabels.indexOf(plantId);
+    let newActivePlantLabels = [...activePlantLabels];
+
+    if (index === -1 && show) {
+      newActivePlantLabels.push(plantId);
+    }
+    
+    if (index !== -1 && !show) {
+      newActivePlantLabels.splice(index, 1);
+    }
+
+    if (newActivePlantLabels.length > 30) {
+      newActivePlantLabels = newActivePlantLabels.slice(-30);
+    }
+
+    setActivePlantLabels(newActivePlantLabels);
+  }
 
   const addMeasurementNode = (measurementNode: MeasurementNode) => {
     if (measurementNodeStart === undefined) {
@@ -69,14 +90,15 @@ function App() {
   const plantClicked = (plant: Plant, e: MouseEvent) => {
     if (tapeActive) {
       addMeasurementNode({ id: plant.id, position: plant.position });
-      return;
     }
 
-    if (plant.id === selectedPlant?.id) {
+    if (plant.id === selectedPlant?.id && !tapeActive) {
+      showPlantLabel(plant.id, false);
       setSelectedPlant(undefined);
       return;
     }
 
+    showPlantLabel(plant.id, true);
     setSelectedPlant(plant);
   }
 
@@ -122,6 +144,7 @@ function App() {
             plant={plant}
             renderer={fullRenderer}
             selected={selectedPlant ? plant.id === selectedPlant.id : false}
+            showLabel={activePlantLabels.includes(plant.id)}
             onClick={e => plantClicked(plant, e)} />
         ))}
         {measurementLines.map(line => (
