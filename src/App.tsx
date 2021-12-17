@@ -25,6 +25,12 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import LocationIndicator from './components/map/location-indicator';
 import { distanceTo } from './lib/leaflet/distance-to';
+import { useTags } from './lib/use-tags';
+import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import TagsPicker from './components/tags-picker';
+import { useSelectedTags } from './lib/use-selected-tags';
+import Badge from '@mui/material/Badge';
+import PlantDetails from './components/plant-details';
 
 const Container = styled.div`
   width: 100vw;
@@ -39,12 +45,15 @@ const FixedFab = styled(Fab)`
 
 function App() {
   const [plants] = usePlants();
+  const [tags] = useTags();
+  const [selectedTags, toggleTag] = useSelectedTags();
   const [selectedPlant, setSelectedPlant] = useState<Plant | undefined>(undefined);
   const [measurementLines, addMeasure, removeMeasurement] = useMeasurementGraph();
   const [tapeActive, setTapeActive] = useState(false);
   const [measurementNodeStart, setMeasurementNodeStart] = useState<MeasurementNode | undefined>(undefined);
   const [geolocationActive, setGeolocationActive, currentCoords] = useGeolocation();
   const [activePlantLabels, setActivePlantLabels] = useState<string[]>([]);
+  const [tagsPickerOpen, setTagsPickerOpen] = useState<boolean>(false);
 
   const fullRenderer = useMemo(() => {
     return new SVG({ padding: 1 });
@@ -145,7 +154,9 @@ function App() {
             renderer={fullRenderer}
             selected={selectedPlant ? plant.id === selectedPlant.id : false}
             showLabel={activePlantLabels.includes(plant.id)}
-            onClick={e => plantClicked(plant, e)} />
+            onClick={e => plantClicked(plant, e)}
+            selectedTags={selectedTags} 
+          />
         ))}
         {measurementLines.map(line => (
           <MeasurementPolyline 
@@ -180,10 +191,29 @@ function App() {
       >
         {geolocationActive ? currentCoords ? <GpsFixedIcon /> : <LocationSearchingIcon /> : <LocationDisabledIcon />}
       </FixedFab>
+      <Badge 
+        badgeContent={selectedTags.length} 
+        overlap="circular" 
+        color="primary" 
+        sx={{ position: 'absolute', zIndex: 1000, right: '16px', bottom: '144px' }}
+      >
+        <Fab onClick={() => setTagsPickerOpen(true)}>
+          <BookmarksIcon />
+        </Fab>
+      </Badge>
       {(currentCoords && geolocationActive) && <Box sx={{ position: 'absolute', top: '24px', right: '88px', zIndex: 1000, backgroundColor: 'white', p: 1, borderRadius: 10 }}>
         <Typography>{(currentCoords.accuracy).toFixed(2)}&nbsp;m</Typography>
       </Box>}
-      <PlantDrawer plant={selectedPlant} distanceTo={distanceToPlant} />
+      <PlantDrawer plant={selectedPlant} distanceTo={distanceToPlant}>
+        {selectedPlant && <PlantDetails plant={selectedPlant} tags={tags} selectedTags={selectedTags} />}
+      </PlantDrawer>
+      <TagsPicker 
+        open={tagsPickerOpen} 
+        onClose={() => setTagsPickerOpen(false)} 
+        tags={tags} 
+        selectedTags={selectedTags} 
+        toggleTag={toggleTag}
+      />
     </Container>
   );
 }

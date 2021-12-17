@@ -4,6 +4,8 @@ import { Circle as LeafletCircle, Renderer } from 'leaflet';
 import HeightTriangle from './height-triangle';
 import { Plant } from '../../models/plant';
 import PinIcon from '../../lib/leaflet/pin-icon';
+import { SelectedTag } from '../../models/selected-tag';
+import { colorFromHueIndex } from '../../lib/color-from-hue-index';
 
 export interface PlantMarkerProps {
   plant: Plant;
@@ -11,9 +13,10 @@ export interface PlantMarkerProps {
   showLabel: boolean;
   selected: boolean;
   renderer: Renderer;
+  selectedTags: SelectedTag[];
 }
 
-export default function PlantMarker({ plant, onClick, showLabel, selected, renderer }: PlantMarkerProps) {
+export default function PlantMarker({ plant, onClick, showLabel, selected, renderer, selectedTags }: PlantMarkerProps) {
   const circleRef = useRef<LeafletCircle | null>(null);
   const [labelFits, setLabelFits] = useState(false);
   const eventHandlers = useMemo(() => ({
@@ -26,9 +29,15 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
     return new PinIcon();
   }, []);
 
-  const isAzoteFixator = useMemo(() => {
-    return plant.tags.includes('fixateurDazote');
-  }, [plant.tags]);
+  const fillColor = useMemo(() => {
+    const firstSelectedTag = selectedTags.find(t => plant.tags.includes(t.id));
+
+    if (!firstSelectedTag) {
+      return 'gray';
+    }
+
+    return colorFromHueIndex(firstSelectedTag.hueIndex, 1);
+  }, [plant.tags, selectedTags]);
 
   const isPinned = useMemo(() => {
     return plant.tags.includes('jalonne');
@@ -61,7 +70,7 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
       radius={plant.width / 2}
       ref={circleRef}
       eventHandlers={eventHandlers}
-      pathOptions={{ color: selected ? 'blue' : 'gray', fillColor: isAzoteFixator ? 'green' : 'gray' }} 
+      pathOptions={{ color: selected ? 'blue' : 'gray', fillColor: fillColor }} 
       weight={1} 
       renderer={renderer} 
     >
@@ -73,7 +82,7 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
           {!isPinned && <HeightTriangle height="40" width="40" className="triangle" />}
         </Tooltip>
       }
-      {isPinned && <Marker icon={pinIcon} position={plant.position} />}
+      {isPinned && <Marker icon={pinIcon} position={plant.position} interactive={false} />}
     </Circle>
   )
 }

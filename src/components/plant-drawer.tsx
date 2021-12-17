@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, PropsWithChildren, useMemo, useState } from 'react';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import { Plant } from '../models/plant';
 import Stack from '@mui/material/Stack';
 import { green, orange, red } from '@mui/material/colors';
-import PlantDetails from './plant-details';
 
 const drawerBleeding = 56;
 
@@ -19,7 +18,7 @@ interface PlantDrawerProps {
   distanceTo?: number;
 }
 
-const PlantDrawer: FC<PlantDrawerProps> = ({ plant, distanceTo }) => {
+const PlantDrawer: FC<PropsWithChildren<PlantDrawerProps>> = ({ plant, distanceTo, children }) => {
   const [open, setOpen] = useState<boolean>(false);
   const distanceColor = useMemo(() => {
     if (!distanceTo) {
@@ -100,7 +99,7 @@ const PlantDrawer: FC<PlantDrawerProps> = ({ plant, distanceTo }) => {
         overflow: 'auto',
       }}
     >
-      {plant && <PlantDetails plant={plant} />}
+      {children}
     </WhiteBox>
   </SwipeableDrawer>
 }
