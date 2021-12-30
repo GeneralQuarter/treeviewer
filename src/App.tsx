@@ -31,6 +31,7 @@ import TagsPicker from './components/tags-picker';
 import { useSelectedTags } from './lib/use-selected-tags';
 import Badge from '@mui/material/Badge';
 import PlantDetails from './components/plant-details';
+import { useMarked } from './lib/use-marked';
 
 const Container = styled.div`
   width: 100vw;
@@ -44,16 +45,24 @@ const FixedFab = styled(Fab)`
 `;
 
 function App() {
-  const [plants] = usePlants();
+  const [marked, toggleMarked] = useMarked();
+  const [plants] = usePlants(marked);
   const [tags] = useTags();
   const [selectedTags, toggleTag] = useSelectedTags();
-  const [selectedPlant, setSelectedPlant] = useState<Plant | undefined>(undefined);
+  const [selectedPlantId, setSelectedPlantId] = useState<string | undefined>(undefined);
   const [measurementLines, addMeasure, removeMeasurement] = useMeasurementGraph();
   const [tapeActive, setTapeActive] = useState(false);
   const [measurementNodeStart, setMeasurementNodeStart] = useState<MeasurementNode | undefined>(undefined);
   const [geolocationActive, setGeolocationActive, currentCoords] = useGeolocation();
   const [activePlantLabels, setActivePlantLabels] = useState<string[]>([]);
   const [tagsPickerOpen, setTagsPickerOpen] = useState<boolean>(false);
+  const selectedPlant = useMemo(() => {
+    if (!plants || !selectedPlantId) {
+      return undefined;
+    }
+
+    return plants.find(p => p.id === selectedPlantId);
+  }, [selectedPlantId, plants]);
 
   const fullRenderer = useMemo(() => {
     return new SVG({ padding: 1 });
@@ -103,12 +112,12 @@ function App() {
 
     if (plant.id === selectedPlant?.id && !tapeActive) {
       showPlantLabel(plant.id, false);
-      setSelectedPlant(undefined);
+      setSelectedPlantId(undefined);
       return;
     }
 
     showPlantLabel(plant.id, true);
-    setSelectedPlant(plant);
+    setSelectedPlantId(plant.id);
   }
 
   const landmarkClicked = (landmark: HardcodedMapObject) => {
@@ -204,7 +213,7 @@ function App() {
       {(currentCoords && geolocationActive) && <Box sx={{ position: 'absolute', top: '24px', right: '88px', zIndex: 1000, backgroundColor: 'white', p: 1, borderRadius: 10 }}>
         <Typography>{(currentCoords.accuracy).toFixed(2)}&nbsp;m</Typography>
       </Box>}
-      <PlantDrawer plant={selectedPlant} distanceTo={distanceToPlant}>
+      <PlantDrawer plant={selectedPlant} distanceTo={distanceToPlant} toggleMarked={toggleMarked}>
         {selectedPlant && <PlantDetails plant={selectedPlant} tags={tags} selectedTags={selectedTags} />}
       </PlantDrawer>
       <TagsPicker 

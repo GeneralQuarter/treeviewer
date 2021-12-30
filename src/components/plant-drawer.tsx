@@ -6,6 +6,8 @@ import Typography from '@mui/material/Typography';
 import { Plant } from '../models/plant';
 import Stack from '@mui/material/Stack';
 import { green, orange, red } from '@mui/material/colors';
+import IconButton from '@mui/material/IconButton';
+import GradeIcon from '@mui/icons-material/Grade';
 
 const drawerBleeding = 56;
 
@@ -16,9 +18,10 @@ const WhiteBox = styled(Box)`
 interface PlantDrawerProps {
   plant?: Plant;
   distanceTo?: number;
+  toggleMarked: (plantId: string) => void;
 }
 
-const PlantDrawer: FC<PropsWithChildren<PlantDrawerProps>> = ({ plant, distanceTo, children }) => {
+const PlantDrawer: FC<PropsWithChildren<PlantDrawerProps>> = ({ plant, distanceTo, children, toggleMarked }) => {
   const [open, setOpen] = useState<boolean>(false);
   const distanceColor = useMemo(() => {
     if (!distanceTo) {
@@ -36,8 +39,29 @@ const PlantDrawer: FC<PropsWithChildren<PlantDrawerProps>> = ({ plant, distanceT
     return red[800];
   }, [distanceTo]);
 
+  const markColor = useMemo(() => {
+    if (!plant) {
+      return 'default';
+    }
+
+    console.log(plant.tags);
+
+    return plant.tags.includes('__marked__') ? 'warning' : 'default';
+  }, [plant]);
+
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
+  };
+
+  const markClick = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!plant) {
+      return;
+    }
+
+    toggleMarked(plant.id);
   };
 
   return <SwipeableDrawer 
@@ -89,6 +113,9 @@ const PlantDrawer: FC<PropsWithChildren<PlantDrawerProps>> = ({ plant, distanceT
             mr: 2, 
             color: distanceColor 
           }}>{distanceTo.toFixed(2)}&nbsp;m</Typography>}
+          <IconButton color={markColor} sx={{mr: 2, ml: distanceTo !== undefined ? 'none' : 'auto'}} onClick={e => markClick(e as any)}>
+            <GradeIcon />
+          </IconButton>
       </Stack>
     </WhiteBox>
     <WhiteBox

@@ -49,7 +49,7 @@ export function useAPICall<T>(name: string, initial: T, getData: () => Promise<T
     } catch (e) {}
 
     // Only try to update data if online and not in development
-    if (navigator.onLine && process.env.NODE_ENV !== 'development') {
+    if (navigator.onLine) {
       (async () => {
         try {
           await fetchData();

@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Circle, Marker, Tooltip, useMapEvent } from 'react-leaflet';
+import { Circle, Tooltip, useMapEvent } from 'react-leaflet';
 import { Circle as LeafletCircle, Renderer } from 'leaflet';
 import HeightTriangle from './height-triangle';
 import { Plant } from '../../models/plant';
-import PinIcon from '../../lib/leaflet/pin-icon';
 import { SelectedTag } from '../../models/selected-tag';
 import { colorFromHueIndex } from '../../lib/color-from-hue-index';
 
@@ -25,10 +24,6 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
     }
   }), [onClick]);
 
-  const pinIcon = useMemo(() => {
-    return new PinIcon();
-  }, []);
-
   const fillColor = useMemo(() => {
     const firstSelectedTag = selectedTags.find(t => plant.tags.includes(t.id));
 
@@ -38,10 +33,6 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
 
     return colorFromHueIndex(firstSelectedTag.hueIndex, 1);
   }, [plant.tags, selectedTags]);
-
-  const isPinned = useMemo(() => {
-    return plant.tags.includes('jalonne');
-  }, [plant.tags]);
 
   const updateLabelFits = useCallback(() => {
     const circle = circleRef.current;
@@ -77,12 +68,11 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
       {showLabel && labelFits && 
         <Tooltip direction="center" interactive={false} permanent={true} className="plant-label">
           <div className="code">{plant.code}</div>
-          {!isPinned && <div className="height">{plant.height}</div>}
-          {!isPinned && <div className="plant-center"></div>}
-          {!isPinned && <HeightTriangle height="40" width="40" className="triangle" />}
+          <div className="height">{plant.height}</div>
+          <div className="plant-center"></div>
+          <HeightTriangle height="40" width="40" className="triangle" />
         </Tooltip>
       }
-      {isPinned && <Marker icon={pinIcon} position={plant.position} interactive={false} />}
     </Circle>
   )
 }
