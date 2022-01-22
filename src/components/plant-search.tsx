@@ -23,7 +23,7 @@ const PlantSearch: FC<PlantSearchProps> = ({ plants, onPlantClicked }) => {
       return p.code.toLowerCase().includes(term) 
         || p.fullLatinName.toLowerCase().includes(term) 
         || p.commonName.toLowerCase().includes(term)
-    }).sort((p1, p2) => p1.code.localeCompare(p2.code));
+    }).sort((p1, p2) => p1.code.localeCompare(p2.code)).slice(0, 15);
   }
 
   return <Autocomplete 
