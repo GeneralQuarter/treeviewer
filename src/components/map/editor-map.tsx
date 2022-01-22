@@ -3,14 +3,19 @@ import { FC, PropsWithChildren, useCallback, useMemo } from 'react';
 import { MapContainer } from 'react-leaflet';
 import { addSmoothWheelZoom } from '../../lib/leaflet/add-smooth-wheel-zoom';
 
-const EditorMap: FC<PropsWithChildren<{}>> = ({ children }) => {
+interface EditorMapProps {
+  setMap: (map: Map) => void
+}
+
+const EditorMap: FC<PropsWithChildren<EditorMapProps>> = ({ children, setMap }) => {
   const initialCenter = useMemo(() => {
     return [46.37926, 0.88279] as LatLngTuple;
   }, []);
 
   const whenCreated = useCallback((map: Map) => {
     addSmoothWheelZoom(map);
-  }, []);
+    setMap(map)
+  }, [setMap]);
 
   return <MapContainer
     center={initialCenter}

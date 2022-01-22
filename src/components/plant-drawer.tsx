@@ -44,8 +44,6 @@ const PlantDrawer: FC<PropsWithChildren<PlantDrawerProps>> = ({ plant, distanceT
       return 'default';
     }
 
-    console.log(plant.tags);
-
     return plant.tags.includes('__marked__') ? 'warning' : 'default';
   }, [plant]);
 

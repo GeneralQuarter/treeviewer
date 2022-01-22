@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import EditorMap from './components/map/editor-map';
 import styled from '@emotion/styled';
 import { useMeasurementGraph } from './lib/use-measurement-graph';
 import POLYGONS from './data/polygons';
 import POLYLINES from './data/polylines';
-import { LatLng, SVG } from 'leaflet';
+import { LatLng, Map, SVG } from 'leaflet';
 import { Plant } from './models/plant';
 import { Polygon, Polyline } from 'react-leaflet';
 import PlantMarker from './components/map/plant-marker';
@@ -32,6 +32,9 @@ import { useSelectedTags } from './lib/use-selected-tags';
 import Badge from '@mui/material/Badge';
 import PlantDetails from './components/plant-details';
 import { useMarked } from './lib/use-marked';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import PlantSearch from './components/plant-search';
 
 const Container = styled.div`
   width: 100vw;
@@ -48,6 +51,7 @@ function App() {
   const [marked, toggleMarked] = useMarked();
   const [plants] = usePlants(marked);
   const [tags] = useTags();
+  const [map, setMap] = useState<Map | undefined>(undefined);
   const [selectedTags, toggleTag] = useSelectedTags();
   const [selectedPlantId, setSelectedPlantId] = useState<string | undefined>(undefined);
   const [measurementLines, addMeasure, removeMeasurement] = useMeasurementGraph();
@@ -76,7 +80,7 @@ function App() {
     return distanceTo(selectedPlant.position, [currentCoords.latitude, currentCoords.longitude]);
   }, [selectedPlant, geolocationActive, currentCoords]);
 
-  const showPlantLabel = (plantId: string, show: boolean) => {
+  const showPlantLabel = useCallback((plantId: string, show: boolean) => {
     const index = activePlantLabels.indexOf(plantId);
     let newActivePlantLabels = [...activePlantLabels];
 
@@ -93,7 +97,7 @@ function App() {
     }
 
     setActivePlantLabels(newActivePlantLabels);
-  }
+  }, [activePlantLabels]);
 
   const addMeasurementNode = (measurementNode: MeasurementNode) => {
     if (measurementNodeStart === undefined) {
@@ -137,9 +141,20 @@ function App() {
     setTapeActive(!tapeActive);
   }
 
+  const plantSearchClicked = useCallback((plant: Plant) => {
+    setSelectedPlantId(plant.id);
+    map?.flyTo([plant.position[0], plant.position[1]], 20);
+    showPlantLabel(plant.id, true);
+  }, [map, showPlantLabel]);
+
   return (
     <Container>
-      <EditorMap>
+      <AppBar position="fixed" color="default">
+        <Toolbar>
+          <PlantSearch plants={plants} onPlantClicked={plantSearchClicked} />
+        </Toolbar>
+      </AppBar>
+      <EditorMap setMap={setMap}>
         {POLYGONS.map(polygon => (
           <Polygon 
             key={polygon.label} 
@@ -194,7 +209,7 @@ function App() {
         <StraightenIcon />
       </FixedFab>
       <FixedFab 
-        sx={{ right: '16px', top: '16px' }} 
+        sx={{ right: '16px', top: '72px' }} 
         color={geolocationActive ? 'primary' : 'default'} 
         onClick={() => setGeolocationActive(!geolocationActive)}
       >
@@ -210,7 +225,7 @@ function App() {
           <BookmarksIcon />
         </Fab>
       </Badge>
-      {(currentCoords && geolocationActive) && <Box sx={{ position: 'absolute', top: '24px', right: '88px', zIndex: 1000, backgroundColor: 'white', p: 1, borderRadius: 10 }}>
+      {(currentCoords && geolocationActive) && <Box sx={{ position: 'absolute', top: '80px', right: '88px', zIndex: 1000, backgroundColor: 'white', p: 1, borderRadius: 10 }}>
         <Typography>{(currentCoords.accuracy).toFixed(2)}&nbsp;m</Typography>
       </Box>}
       <PlantDrawer plant={selectedPlant} distanceTo={distanceToPlant} toggleMarked={toggleMarked}>

@@ -32,8 +32,6 @@ export function usePlants(markedPlantIds: string[]): UseAPICall<Plant[]> {
       }
     });
 
-    console.log(newPlants.find(p => p.id === '3BFMstQvj8CCQvQU2Q0jcm'))
-
     setPlants(newPlants);
   }, [markedPlantIds, data]);
 
