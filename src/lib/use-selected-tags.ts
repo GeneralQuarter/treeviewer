@@ -8,7 +8,7 @@ type UseSelectedTags = [
 ]
 
 export function useSelectedTags(): UseSelectedTags {
-  const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<SelectedTag[]>([{id: '__marked__', hueIndex: 2}]);
 
   const getNextHueIndex = useCallback(() => {
     const hueIndexes = Array(HUE_FRACTIONS).fill(null).map((_, i) => selectedTags.some(t => t.hueIndex === i) ? null : i).filter(n => n !== null);
