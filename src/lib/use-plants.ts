@@ -6,7 +6,7 @@ import { useAPICall, UseAPICall } from './use-api-call';
 export function usePlants(markedPlantIds: string[]): UseAPICall<Plant[]> {
   const getPlants = useCallback(async () => {
     const res = await getPlantsWithPosition();
-    return res.items;
+    return res.items.sort((a, b) => b.width - a.width);
   }, []);
 
   const [data, loading, error] = useAPICall<Plant[]>('plants', [], getPlants);

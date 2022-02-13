@@ -54,6 +54,14 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
     }
   }, [circleRef, labelFits]);
 
+  const color = useMemo(() => {
+    if (selected) {
+      return `blue`;
+    }
+
+    return `gray`;
+  }, [selected]);
+
   useMapEvent('moveend', updateLabelFits);
   
   return (
@@ -61,7 +69,7 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
       radius={plant.width / 2}
       ref={circleRef}
       eventHandlers={eventHandlers}
-      pathOptions={{ color: selected ? 'blue' : 'gray', fillColor: fillColor }} 
+      pathOptions={{ color, fillColor }} 
       weight={1} 
       renderer={renderer} 
     >

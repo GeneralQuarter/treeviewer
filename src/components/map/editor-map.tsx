@@ -14,7 +14,7 @@ const EditorMap: FC<PropsWithChildren<EditorMapProps>> = ({ children, setMap }) 
 
   const whenCreated = useCallback((map: Map) => {
     addSmoothWheelZoom(map);
-    setMap(map)
+    setMap(map);
   }, [setMap]);
 
   return <MapContainer
