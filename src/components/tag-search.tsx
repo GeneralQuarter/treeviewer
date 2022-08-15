@@ -28,7 +28,7 @@ const TagSearch: FC<TagSearchProps> = ({ tags, onTagClick, disabled }) => {
 
       setInputValue(newValue);
     }}
-    getOptionLabel={o => o.label}
+    getOptionLabel={(o: string | Tag) => typeof o === 'string' ? o : o.label}
     autoHighlight
     fullWidth
     onChange={(_, value) => {

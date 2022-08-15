@@ -10,7 +10,7 @@ interface MeasurementPolylineProps {
   tooltipClick?: () => void;
 }
 
-const measurementPathoptions: PathOptions = { color: 'purple', dashArray: '3', weight: 1 };
+const measurementPathoptions: PathOptions = { color: 'purple', dashArray: '3', weight: 1, interactive: false };
 
 const MeasurementPolyline: FC<MeasurementPolylineProps> = ({ line, tooltipClick, renderer }) => {
   const distance = useMemo(() => {

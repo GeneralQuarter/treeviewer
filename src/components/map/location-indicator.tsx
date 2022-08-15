@@ -9,7 +9,7 @@ interface LocationIndicatorProps {
   renderer: Renderer;
 }
 
-const locationIndicatorPathOptions: PathOptions = { fillColor: blue[700], fillOpacity: 0.4, color: blue[700], opacity: 0.5 };
+const locationIndicatorPathOptions: PathOptions = { fillColor: blue[700], fillOpacity: 0.4, color: blue[700], opacity: 0.5, interactive: false };
 
 const LocationIndicator: FC<LocationIndicatorProps> = ({ coords, renderer }) => {
   return <Circle 

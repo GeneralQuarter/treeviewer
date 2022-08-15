@@ -14,7 +14,7 @@ interface PlantDetailsProps {
 }
 
 const PlantDetails: FC<PlantDetailsProps> = ({ plant, tags, selectedTags }) => {
-  const getBgColor = useCallback(tagId => {
+  const getBgColor = useCallback((tagId: string) => {
     const firstSelectedTag = selectedTags.find(t => t.id === tagId);
 
     if (!firstSelectedTag) {

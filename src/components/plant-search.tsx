@@ -34,7 +34,7 @@ const PlantSearch: FC<PlantSearchProps> = ({ plants, onPlantClicked }) => {
     filterOptions={filterPlants}
     noOptionsText={`No results for "${inputValue}"`}
     onInputChange={(_, newValue) => setInputValue(newValue)}
-    getOptionLabel={o => o.code}
+    getOptionLabel={(o: string | Plant) => typeof o === 'string' ? o : o.code}
     autoHighlight
     fullWidth
     clearOnBlur

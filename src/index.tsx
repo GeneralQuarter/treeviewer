@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,12 +12,13 @@ import '@fontsource/roboto/700.css';
 import 'leaflet/dist/leaflet.css';
 import './index.scss';
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!);
+
+root.render(
   <React.StrictMode>
     <CssBaseline />
     <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change
