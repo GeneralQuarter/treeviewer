@@ -3,6 +3,7 @@ export interface Plant {
   code: string;
   fullLatinName: string;
   commonName: string;
+  sponsor: string;
   width: number;
   height: number;
   position: [lat: number, lon: number];

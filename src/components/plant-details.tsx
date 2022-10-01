@@ -24,6 +24,7 @@ const PlantDetails: FC<PlantDetailsProps> = ({ plant, tags, selectedTags }) => {
     return colorFromHueIndex(firstSelectedTag.hueIndex);
   }, [selectedTags])
   return <Stack>
+    {plant.sponsor && <Typography variant="body2">Parrainé par <Typography color="primary" component="span">{plant.sponsor}</Typography></Typography>}
     <Typography variant="h5">{plant.fullLatinName}</Typography>
     <Typography variant="subtitle1">{plant.commonName}</Typography>
     <Typography mt={1}>{plant.height}&nbsp;m x {plant.width}&nbsp;m</Typography>
