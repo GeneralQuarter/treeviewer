@@ -67,7 +67,7 @@ const TagsPicker: FC<TagsPickerProps> = ({ open, onClose, tags, selectedTags, to
           <TagSearch tags={tagList} onTagClick={tag => toggleTag(tag.id)} disabled={selectedTagList.length >= HUE_FRACTIONS} />
         </Toolbar>
       </AppBar>
-      <TagPickerList subheader={`${selectedTagList.length} tag${selectedTagList.length > 1 ? 's' : ''} selected`} tagClicked={tagId => toggleTag(tagId)} tags={selectedTagList} />
+      <TagPickerList subheader={`${selectedTagList.length} tag${selectedTagList.length > 1 ? 's' : ''} sélectioné${selectedTagList.length > 1 ? 's' : ''}`} tagClicked={tagId => toggleTag(tagId)} tags={selectedTagList} />
     </Stack>
   </Dialog>;
 }

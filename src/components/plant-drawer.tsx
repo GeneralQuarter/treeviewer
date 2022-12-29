@@ -100,7 +100,7 @@ const PlantDrawer: FC<PropsWithChildren<PlantDrawerProps>> = ({ plant, distanceT
             color: plant ? 'text.primary' : 'text.secondary', 
             fontWeight: plant ? 'bold' : 'normal', 
           }}
-        >{plant ? plant.code : 'Select a plant'}</Typography>
+        >{plant ? plant.code : 'Sélectionner une plante'}</Typography>
         {distanceTo !== undefined && <Typography 
           sx={{ 
             fontWeight: 500, 

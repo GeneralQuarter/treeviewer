@@ -43,7 +43,7 @@ const TagSearch: FC<TagSearchProps> = ({ tags, onTagClick, disabled }) => {
       <InputBase 
         {...params}
         {...InputProps}
-        placeholder={disabled ? 'Tag limit reached' : 'Search Tags'}
+        placeholder={disabled ? 'Limite de tag atteinte' : 'Recherche de tags'}
         sx={{ color: 'inherit' }}
       />
     )}

@@ -17,13 +17,14 @@ const PlantSearch: FC<PlantSearchProps> = ({ plants, onPlantClicked }) => {
   const [value, setValue] = useState<Plant | null>(null);
 
   const filterPlants = (options: Plant[], state: FilterOptionsState<Plant>): Plant[] => {
-    const term = (state.inputValue ?? '').trim().toLowerCase();
+    const term = (state.inputValue ?? '').trim().toLocaleLowerCase();
 
     return options.filter(p => {
-      return p.code.toLowerCase().includes(term) 
-        || p.fullLatinName.toLowerCase().includes(term) 
-        || p.commonName.toLowerCase().includes(term)
-    }).sort((p1, p2) => p1.code.localeCompare(p2.code)).slice(0, 15);
+      return p.code.toLocaleLowerCase().includes(term) 
+        || p.fullLatinName.toLocaleLowerCase().includes(term) 
+        || p.commonName.toLocaleLowerCase().includes(term)
+        || p.sponsor?.toLocaleLowerCase().includes(term)
+    }).sort((p1, p2) => p1.code.localeCompare(p2.code)).slice(0, 100);
   }
 
   return <Autocomplete 
@@ -52,7 +53,7 @@ const PlantSearch: FC<PlantSearchProps> = ({ plants, onPlantClicked }) => {
       <InputBase 
         {...params}
         {...InputProps}
-        placeholder="Search"
+        placeholder="Recherche"
         sx={{ color: 'inherit' }}
       />
     )}
@@ -61,6 +62,9 @@ const PlantSearch: FC<PlantSearchProps> = ({ plants, onPlantClicked }) => {
         <Stack>
           <Typography variant="body2" component="div">
             {option.commonName}
+          </Typography>
+          <Typography variant="body2" component="div" color={option.sponsor ? 'primary' : 'grey'} sx={{ fontStyle: option.sponsor ? 'normal' : 'italic' }}>
+            {option.sponsor ? option.sponsor : 'Pas de parrain'}
           </Typography>
           <Typography variant="body1" component="div" sx={{ fontWeight: 'bold' }}>
             {option.code}
