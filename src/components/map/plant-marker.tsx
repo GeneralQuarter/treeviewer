@@ -13,9 +13,10 @@ export interface PlantMarkerProps {
   selected: boolean;
   renderer: Renderer;
   selectedTags: SelectedTag[];
+  showCanopy: boolean;
 }
 
-export default function PlantMarker({ plant, onClick, showLabel, selected, renderer, selectedTags }: PlantMarkerProps) {
+export default function PlantMarker({ plant, onClick, showLabel, selected, renderer, selectedTags, showCanopy }: PlantMarkerProps) {
   const circleRef = useRef<LeafletCircle | null>(null);
   const [labelFits, setLabelFits] = useState(false);
   const eventHandlers = useMemo(() => ({
@@ -62,11 +63,16 @@ export default function PlantMarker({ plant, onClick, showLabel, selected, rende
     return `gray`;
   }, [selected]);
 
+  const radius = useMemo(() => {
+    const plantRadius = plant.width / 2;
+    return showCanopy || plantRadius < 1 ? plantRadius : 1;
+  }, [plant.width, showCanopy]);
+
   useMapEvent('moveend', updateLabelFits);
   
   return (
     <Circle center={plant.position} 
-      radius={plant.width / 2}
+      radius={radius}
       ref={circleRef}
       eventHandlers={eventHandlers}
       pathOptions={{ color, fillColor }} 

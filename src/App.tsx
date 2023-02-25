@@ -16,6 +16,8 @@ import StraightenIcon from '@mui/icons-material/Straighten';
 import LocationDisabledIcon from '@mui/icons-material/LocationDisabled';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import GrassIcon from '@mui/icons-material/Grass';
+import ParkIcon from '@mui/icons-material/Park';
 import LANDMARKS from './data/landmarks';
 import LandmarkMarker from './components/map/landmark-marker';
 import { HardcodedMapObject } from './models/leaflet/hardcoded-map-object';
@@ -64,6 +66,7 @@ function App() {
   const [tapeActive, setTapeActive] = useState(false);
   const [measurementNodeStart, setMeasurementNodeStart] = useState<MeasurementNode | undefined>(undefined);
   const [geolocationActive, setGeolocationActive, currentCoords] = useGeolocation();
+  const [showCanopy, setShowCanopy] = useState<boolean>(false);
   const [activePlantLabels, setActivePlantLabels] = useState<string[]>([]);
   const [tagsPickerOpen, setTagsPickerOpen] = useState<boolean>(false);
   const selectedPlant = useMemo(() => {
@@ -192,6 +195,7 @@ function App() {
             showLabel={activePlantLabels.includes(plant.id)}
             onClick={e => plantClicked(plant, e)}
             selectedTags={selectedTags}
+            showCanopy={showCanopy}
           />
         ))}
         {/* wait for plants to be loaded (to draw rectangles on top) */}
@@ -233,6 +237,13 @@ function App() {
         onClick={() => setGeolocationActive(!geolocationActive)}
       >
         {geolocationActive ? currentCoords ? <GpsFixedIcon /> : <LocationSearchingIcon /> : <LocationDisabledIcon />}
+      </FixedFab>
+      <FixedFab
+        sx={{ right: '16px', top: '144px' }}
+        color={showCanopy ? 'primary' : 'default'}
+        onClick={() => setShowCanopy(!showCanopy)}
+      >
+        {showCanopy ? <ParkIcon /> : <GrassIcon />}
       </FixedFab>
       <Badge
         badgeContent={selectedTags.length}
